@@ -2,6 +2,7 @@ Flask==0.10.1
 Flask-SQLAlchemy==0.16
 Jinja2==2.7
 Werkzeug==0.9.1
+coverage==3.6
 factory_boy==2.1.0
 itsdangerous==0.21
 mock==1.0.1
