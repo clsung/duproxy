@@ -1,0 +1,11 @@
+stream/*
+stream_test/*
+dist/*
+build/*
+*.egg-info
+*.py~
+*.pyc
+*.un~
+.coverage
+!.gitignore
+
