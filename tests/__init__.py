@@ -79,6 +79,9 @@ class DUProxyTestCase(TestCase):
     def jget(self, *args, **kwargs):
         return self._jrequest(self.client.get, *args, **kwargs)
 
+    def post(self, *args, **kwargs):
+        return self._request(self.client.post, *args, **kwargs)
+
     def jpost(self, *args, **kwargs):
         return self._jrequest(self.client.post, *args,
                               **self._json_data(kwargs))

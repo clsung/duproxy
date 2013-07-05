@@ -37,10 +37,15 @@ class FileStoreApiTestCase(DUProxyApiTestCase):
         self.assertOkJson(r)
 
     def test_upload_with_invalid_file(self):
+        r = self.post(
+            '/v1/filestores/stream?g_id={0}'.format(
+                self.filestore.g_id
+            ))
+        self.assertStatusCode(r, 400)
+
+    def test_upload_with_invalid_id(self):
         r = self.post_with_file(
-            '/v1/filestores/stream?g_id={0}&md5={1}'.format(
-                self.filestore.g_id, self.filestore.md5
-            ),
+            '/v1/filestores/stream',
             data={
                 'file': (StringIO('Foo bar baz' * 1024 * 1024), "N/A"),
             })
@@ -49,9 +54,10 @@ class FileStoreApiTestCase(DUProxyApiTestCase):
     def test_upload_with_file(self):
         import hashlib
         m = hashlib.md5('Foo bar baz' * 1024 * 1024)
+        g_id = "123456789"
         r = self.post_with_file(
-            '/v1/filestores/stream?g_id={0}&md5={1}'.format(
-                self.filestore.g_id, m.hexdigest()
+            '/v1/filestores/stream?g_id={0}'.format(
+                g_id
             ),
             data={
                 'file': (StringIO('Foo bar baz' * 1024 * 1024), "N/A"),
@@ -61,7 +67,7 @@ class FileStoreApiTestCase(DUProxyApiTestCase):
 
         r = self.get(
             '/v1/filestores/stream/{0}{1}'.format(
-                self.filestore.g_id, m.hexdigest()
+                g_id, m.hexdigest()
             )
         )
         self.assertEquals('Foo bar baz' * 1024 * 1024, r.data)

@@ -40,18 +40,14 @@ def create():
 def upload():
     """Accept a stream file upload"""
     import hashlib
-    md5 = request.args.get('md5', None)
+    import shutil
     g_id = request.args.get('g_id', None)
-    if md5 is None:
-        raise DUProxyError('MD5 is required')
     if g_id is None:
         raise DUProxyError('g_id is required')
-    if len(md5) != 32:
-        raise DUProxyError('Invalid MD5')
     if not request.files or request.files.get('file', None) is None:
         raise DUProxyError('No file specified')
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                             ''.join([g_id, md5]))
+                             g_id)
     m = hashlib.md5()
     with open(file_path, 'wb') as f:
         while True:
@@ -60,10 +56,12 @@ def upload():
                 break
             m.update(data)
             f.write(data)
-    if m.hexdigest() != md5:
-        raise DUProxyError("MD5 not match")
+    md5 = m.hexdigest()
+    shutil.move(file_path, file_path+md5)
 
-    return "File created", 201
+    return filestores.create(g_id=g_id,
+                             md5=md5,
+                             local_path=file_path), 201
 
 
 @route(v1_fs, '/<id_md5>')
