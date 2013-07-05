@@ -15,6 +15,6 @@ class FileStore(JsonSerializer, db.Model):
     __json_hidden__ = ['local_path']
 
     id = db.Column(db.Integer, primary_key=True)
-    g_id = db.Column(db.String(100))
+    g_id = db.Column(db.String(160))
     md5 = db.Column(db.String(40))
     local_path = db.Column(db.String())
