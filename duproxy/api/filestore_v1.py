@@ -83,13 +83,14 @@ def update(id_md5):
         raise DUProxyError('g_id is required')
     filestore = filestores.get_or_404(id_md5)
     new_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                                 g_id, md5)
+                                 g_id + md5)
     try:
-        shutil.move(file_path, new_file_path)
+        shutil.move(filestore.local_path, new_file_path)
     except Exception as e:
         raise DUProxyError(repr(e))
-    return filestores.update(filestore, {"g_id": g_id,
-                                         "local_path": new_file_path})
+    filestore.local_path = new_file_path
+    filestore.g_id = g_id
+    return filestores.update(filestore)
 
 
 @route(v1_fs, '/<id_md5>', methods=['DELETE'])

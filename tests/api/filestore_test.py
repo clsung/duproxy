@@ -80,7 +80,7 @@ class FileStoreApiTestCase(DUProxyApiTestCase):
 
     def test_update_filestore(self):
         r = self.jput('/v1/filestores/{0}'.format(self.filestore.id), data={
-            'g_id': 'Old filestore'
+            'g_id': 'filestore_123', 'md5': 'axsd' * 10
         })
         self.assertOkJson(r)
 
