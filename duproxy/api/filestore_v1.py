@@ -57,11 +57,12 @@ def upload():
             m.update(data)
             f.write(data)
     md5 = m.hexdigest()
-    shutil.move(file_path, file_path+md5)
+    new_file_path = file_path + md5
+    shutil.move(file_path, new_file_path)
 
     return filestores.create(g_id=g_id,
                              md5=md5,
-                             local_path=file_path), 201
+                             local_path=new_file_path), 201
 
 
 @route(v1_fs, '/<id_md5>')
@@ -73,7 +74,22 @@ def show(id_md5):
 @route(v1_fs, '/<id_md5>', methods=['PUT'])
 def update(id_md5):
     """Returns a user instance."""
-    return filestores.update(filestores.get_or_404(id_md5), **request.json)
+    import shutil
+    md5 = request.json.get('md5', None)
+    if md5 is None:
+        raise DUProxyError('MD5 is required')
+    g_id = request.json.get('g_id', None)
+    if g_id is None:
+        raise DUProxyError('g_id is required')
+    filestore = filestores.get_or_404(id_md5)
+    new_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
+                                 g_id, md5)
+    try:
+        shutil.move(file_path, new_file_path)
+    except Exception as e:
+        raise DUProxyError(repr(e))
+    return filestores.update(filestore, {"g_id": g_id,
+                                         "local_path": new_file_path})
 
 
 @route(v1_fs, '/<id_md5>', methods=['DELETE'])
