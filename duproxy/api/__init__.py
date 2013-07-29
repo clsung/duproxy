@@ -6,6 +6,8 @@
     duproxy api package
 """
 
+import os
+
 from functools import wraps
 
 from flask import jsonify
@@ -30,6 +32,8 @@ def create_app(settings_override=None):
     app.errorhandler(DUProxyError)(on_duproxy_error)
     app.errorhandler(404)(on_404)
     app.errorhandler(405)(on_405)
+    if os.path.exists(os.path.join(app.instance_path, 'disable')):
+        app.config['DISABLE'] = True
 
     return app
 
