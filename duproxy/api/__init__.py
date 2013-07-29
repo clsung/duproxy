@@ -17,7 +17,7 @@ from .. import application
 
 
 def create_app(settings_override=None):
-    """Returns the Overholt API application instance"""
+    """Returns the DUProxy API application instance"""
 
     app = application.create_app(__name__,
                                  __path__,

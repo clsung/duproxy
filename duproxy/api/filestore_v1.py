@@ -17,6 +17,12 @@ from . import route
 v1_fs = Blueprint('filestores', __name__, url_prefix='/v1/filestores')
 
 
+@v1_fs.before_request
+def before_request():
+    if current_app.config.get('DISABLE', False):
+        return 'Disabled', 404
+
+
 @route(v1_fs, '/', methods=['GET'])
 def list():
     """List all filestores"""
