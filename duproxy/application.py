@@ -23,7 +23,10 @@ def create_app(package_name, package_path, settings_override=None):
 
     app.config.from_object('duproxy.settings')
     app.config.from_pyfile('settings.cfg', silent=True)
-    app.config.from_object(settings_override)
+    try:
+        app.config.from_object(settings_override)
+    except ImportError:
+        pass
 
     db.init_app(app)
 

@@ -4,7 +4,7 @@ from flask.ext.script import Manager
 from duproxy import api
 from duproxy.core import db
 
-app = api.create_app()
+app = api.create_app('local_settings')
 manager = Manager(app)
 
 
