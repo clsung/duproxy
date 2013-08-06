@@ -8,4 +8,4 @@ install:
 before_script:
   - mkdir -p stream_test
 
-script: nosetests --verbosity=2 --with-coverage --cover-erase --cover-package=duproxy
+script: nosetests --verbosity=2 --with-coverage --cover-erase --cover-package=duproxy tests/
