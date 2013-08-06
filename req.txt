@@ -1,5 +1,6 @@
 Flask==0.10.1
-Flask-SQLAlchemy==0.16
+Flask-SQLAlchemy==1.0
+Flask-Script==0.5.3
 Jinja2==2.7
 Werkzeug==0.9.1
 coverage==3.6
