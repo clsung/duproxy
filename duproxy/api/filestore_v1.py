@@ -45,30 +45,14 @@ def create():
 @route(v1_fs, '/stream', methods=['POST'])
 def upload():
     """Accept a stream file upload"""
-    import hashlib
-    import shutil
+    from ..task import upload_filestore
     g_id = request.args.get('g_id', None)
     if g_id is None:
         raise DUProxyError('g_id is required')
     if not request.files or request.files.get('file', None) is None:
         raise DUProxyError('No file specified')
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                             g_id)
-    m = hashlib.md5()
-    with open(file_path, 'wb') as f:
-        while True:
-            data = request.files['file'].stream.read(1048576)
-            if not data:
-                break
-            m.update(data)
-            f.write(data)
-    md5 = m.hexdigest()
-    new_file_path = file_path + md5
-    shutil.move(file_path, new_file_path)
-
-    return filestores.create(g_id=g_id,
-                             md5=md5,
-                             local_path=new_file_path), 201
+    t = upload_filestore.delay(g_id, request.files['file'].stream)
+    return t.result, 201
 
 
 @route(v1_fs, '/<id_md5>')
@@ -81,7 +65,6 @@ def show(id_md5):
 def update(id_md5):
     from ..task import update_filestore
     """Returns a user instance."""
-    import shutil
     md5 = request.json.get('md5', None)
     if md5 is None:
         raise DUProxyError('MD5 is required')

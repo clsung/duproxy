@@ -18,3 +18,10 @@ class FileStore(JsonSerializer, db.Model):
     g_id = db.Column(db.String(160))
     md5 = db.Column(db.String(40))
     local_path = db.Column(db.String())
+
+    @property
+    def to_dict(self):
+        d = {}
+        for c in self.__table__.columns:
+            d[c.name] = getattr(self, c.name)
+        return d

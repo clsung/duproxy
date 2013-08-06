@@ -6,6 +6,7 @@ duproxy.tasks
 duproxy tasks module for Celery
 """
 import os
+import hashlib
 import shutil
 
 from celery.utils.log import get_task_logger
@@ -19,6 +20,26 @@ from .services import filestores
 logger = get_task_logger(__name__)
 celery = create_celery_app(current_app)
 
+
+@celery.task()
+def upload_filestore(g_id, file_stream):
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
+                             g_id)
+    m = hashlib.md5()
+    with open(file_path, 'wb') as f:
+        while True:
+            data = file_stream.read(1048576)
+            if not data:
+                break
+            m.update(data)
+            f.write(data)
+    md5 = m.hexdigest()
+    new_file_path = file_path + md5
+    shutil.move(file_path, new_file_path)
+
+    return filestores.create(g_id=g_id,
+                             md5=md5,
+                             local_path=new_file_path).to_dict
 
 @celery.task(ignore_result=True)
 def update_filestore(id_md5, g_id, md5):
