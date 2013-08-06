@@ -4,6 +4,7 @@ Flask-Script==0.5.3
 Jinja2==2.7
 Werkzeug==0.9.1
 celery==3.0.21
+celery-with-redis==3.0
 coverage==3.6
 factory_boy==2.1.0
 itsdangerous==0.21
