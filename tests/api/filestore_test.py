@@ -76,14 +76,28 @@ class FileStoreApiTestCase(DUProxyApiTestCase):
         r = self.jpost('/v1/filestores', data={
             'g_id': 'New filestore', 'md5': 'axsd' * 4
         })
+        self.assertStatusCode(r, 400)
         self.assertBadJson(r)
 
     def test_update_filestore(self):
         r = self.jput('/v1/filestores/{0}'.format(self.filestore.id), data={
             'g_id': 'filestore_123', 'md5': 'axsd' * 10
         })
+        self.assertStatusCode(r, 200)
         self.assertOkJson(r)
 
     def test_delete_filestore(self):
         r = self.jdelete('/v1/filestores/{0}'.format(self.filestore.id))
         self.assertStatusCode(r, 204)
+
+    def test_celery_update_filestore(self):
+        import json
+        f_id = self.filestore.id
+        r = self.jput('/v1/filestores/{0}'.format(f_id), data={
+            'g_id': 'filestore_123', 'md5': 'axsd' * 10
+        })
+        self.assertStatusCode(r, 200)
+        r = self.jget('/v1/filestores/{0}'.format(f_id))
+        self.assertOkJson(r)
+        result = json.loads(r.data)
+        self.assertEquals("filestore_123", result['data']['g_id'])

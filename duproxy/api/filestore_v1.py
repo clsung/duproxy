@@ -88,18 +88,8 @@ def update(id_md5):
     g_id = request.json.get('g_id', None)
     if g_id is None:
         raise DUProxyError('g_id is required')
-    update_filestore.delay(g_id, md5)
+    update_filestore.delay(id_md5, g_id, md5)
     return "", 200
-#    filestore = filestores.get_or_404(id_md5)
-#    new_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
-#                                 g_id + md5)
-#    try:
-#        shutil.move(filestore.local_path, new_file_path)
-#    except Exception as e:
-#        raise DUProxyError(repr(e))
-#    filestore.local_path = new_file_path
-#    filestore.g_id = g_id
-#    return filestores.update(filestore)
 
 
 @route(v1_fs, '/<id_md5>', methods=['DELETE'])
