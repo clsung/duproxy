@@ -21,6 +21,9 @@ logger = get_task_logger(__name__)
 celery = create_celery_app(current_app)
 
 
+if __name__ == '__main__':
+    celery.start()
+
 @celery.task()
 def upload_filestore(g_id, file_stream):
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
