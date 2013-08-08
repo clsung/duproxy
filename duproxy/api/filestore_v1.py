@@ -51,7 +51,8 @@ def upload():
         raise DUProxyError('g_id is required')
     if not request.files or request.files.get('file', None) is None:
         raise DUProxyError('No file specified')
-    t = upload_filestore.delay(g_id, request.files['file'].stream)
+    t = upload_filestore.delay(current_app.config['UPLOAD_FOLDER'],
+                               g_id, request.files['file'].stream)
     return t.result, 201
 
 
@@ -71,7 +72,8 @@ def update(id_md5):
     g_id = request.json.get('g_id', None)
     if g_id is None:
         raise DUProxyError('g_id is required')
-    update_filestore.delay(id_md5, g_id, md5)
+    update_filestore.delay(current_app.config['UPLOAD_FOLDER'],
+                           id_md5, g_id, md5)
     return "", 200
 
 
