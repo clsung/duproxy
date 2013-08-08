@@ -13,16 +13,19 @@ from celery.utils.log import get_task_logger
 from celery.signals import task_postrun
 from flask import current_app
 
+from duproxy import api
 from .core import db
 from .application import create_celery_app
 from .services import filestores
 
 logger = get_task_logger(__name__)
-celery = create_celery_app(current_app)
+
+celery = create_celery_app(current_app or api.create_app('local_settings'))
 
 
 if __name__ == '__main__':
     celery.start()
+
 
 @celery.task()
 def upload_filestore(dir_path, g_id, file_stream):
@@ -43,6 +46,7 @@ def upload_filestore(dir_path, g_id, file_stream):
                              md5=md5,
                              local_path=new_file_path).to_dict
 
+
 @celery.task(ignore_result=True)
 def update_filestore(dir_path, id_md5, g_id, md5):
     filestore = filestores.get(id_md5)
@@ -59,6 +63,7 @@ def update_filestore(dir_path, id_md5, g_id, md5):
     filestore.local_path = new_file_path
     filestore.g_id = g_id
     return filestores.update(filestore)
+
 
 @task_postrun.connect
 def close_session(*args, **kwargs):
