@@ -26,10 +26,12 @@ if __name__ == '__main__':
 
 @celery.task()
 def upload_filestore(g_id, file_stream):
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
+    file_path = os.path.join(os.path.dirname(__file__),
+                             os.pardir,
+                             current_app.config['UPLOAD_FOLDER'],
                              g_id)
     m = hashlib.md5()
-    with open(file_path, 'wb') as f:
+    with open(os.path.abspath(file_path), 'wb') as f:
         while True:
             data = file_stream.read(1048576)
             if not data:
@@ -50,7 +52,9 @@ def update_filestore(id_md5, g_id, md5):
     if filestore is None:
         logger.error("No such filestore {0}".format(id_md5))
         return
-    new_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
+    new_file_path = os.path.join(os.path.dirname(__file__),
+                                 os.pardir,
+                                 current_app.config['UPLOAD_FOLDER'],
                                  g_id + md5)
     try:
         shutil.move(filestore.local_path, new_file_path)

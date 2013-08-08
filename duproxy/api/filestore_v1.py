@@ -85,7 +85,9 @@ def delete(id_md5):
 @v1_fs.route('/stream/<id_md5>')
 def download_file(id_md5):
     import os
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'],
+    file_path = os.path.join(os.path.dirname(__file__),
+                             os.pardir, os.pardir,
+                             current_app.config['UPLOAD_FOLDER'],
                              id_md5)
     if not os.path.isfile(file_path):
         raise DUProxyError('Invalid file path')
