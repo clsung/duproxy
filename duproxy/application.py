@@ -37,8 +37,9 @@ def create_app(package_name, package_path, settings_override=None):
 
     return app
 
-def create_celery_app(app=None):
-    app = app or create_app('duproxy', os.path.dirname(__file__))
+def create_celery_app(app=None, settings_override=None):
+    app = app or create_app('duproxy', os.path.dirname(__file__),
+                            settings_override)
     celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
     celery.conf.update(app.config)
     TaskBase = celery.Task
