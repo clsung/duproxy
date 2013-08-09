@@ -5,8 +5,6 @@
 
     duproxy api package
 """
-import os
-
 from flask import Blueprint, request, current_app
 from flask import Response
 
@@ -53,7 +51,7 @@ def upload():
         raise DUProxyError('No file specified')
     t = upload_filestore.delay(current_app.config['UPLOAD_FOLDER'],
                                g_id, request.files['file'].stream)
-    return t.result, 201
+    return t.get(), 201
 
 
 @route(v1_fs, '/<id_md5>')
