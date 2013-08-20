@@ -28,20 +28,7 @@ if __name__ == '__main__':
 
 
 @celery.task()
-def upload_filestore(dir_path, g_id, file_stream):
-    file_path = os.path.join(dir_path, g_id)
-    m = hashlib.md5()
-    with open(os.path.abspath(file_path), 'wb') as f:
-        while True:
-            data = file_stream.read(1048576)
-            if not data:
-                break
-            m.update(data)
-            f.write(data)
-    md5 = m.hexdigest()
-    new_file_path = file_path + md5
-    shutil.move(file_path, new_file_path)
-
+def upload_filestore(g_id, md5, new_file_path):
     return filestores.create(g_id=g_id,
                              md5=md5,
                              local_path=new_file_path).to_dict

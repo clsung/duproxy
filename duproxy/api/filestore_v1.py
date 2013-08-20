@@ -43,14 +43,31 @@ def create():
 @route(v1_fs, '/stream', methods=['POST'])
 def upload():
     """Accept a stream file upload"""
+    import os
+    import shutil
+    from hashlib import md5
     from ..task import upload_filestore
     g_id = request.args.get('g_id', None)
     if g_id is None:
         raise DUProxyError('g_id is required')
     if not request.files or request.files.get('file', None) is None:
         raise DUProxyError('No file specified')
-    t = upload_filestore.delay(current_app.config['UPLOAD_FOLDER'],
-                               g_id, request.files['file'].stream)
+
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], g_id)
+
+    m = md5()
+    with open(os.path.abspath(file_path), 'wb') as f:
+        while True:
+            data = request.files['file'].stream.read(1048576)
+            if not data:
+                break
+            m.update(data)
+            f.write(data)
+    md5 = m.hexdigest()
+    new_file_path = file_path + md5
+    shutil.move(file_path, new_file_path)
+
+    t = upload_filestore.delay(g_id, md5, new_file_path)
     return t.get(), 201
 
 
